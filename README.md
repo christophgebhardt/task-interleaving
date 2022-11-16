@@ -4,9 +4,8 @@ The code accompanying the paper "Hierarchical Reinforcement Learning Explains Ta
 - Authors: [Christoph Gebhardt](https://ait.ethz.ch/people/gebhardt/), [Antti Oulasvirta](http://users.comnet.aalto.fi/oulasvir/), [Otmar Hilliges](https://ait.ethz.ch/people/hilliges/)
 - Project page: https://ait.ethz.ch/projects/2020/hrl-task-interleaving/
 
-## Setup
-
 ## Hierarchical Reinforcement Learning Model
+# Setup
 
 ## Model Fitting with Approximate Bayesian Computation
 To be published soon.
