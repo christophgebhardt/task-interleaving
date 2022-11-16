@@ -5,7 +5,7 @@ The code accompanying the paper "Hierarchical Reinforcement Learning Explains Ta
 - Project page: https://ait.ethz.ch/projects/2020/hrl-task-interleaving/
 
 ## Hierarchical Reinforcement Learning Model
-# Setup
+### Setup
 
 ## Model Fitting with Approximate Bayesian Computation
 To be published soon.
