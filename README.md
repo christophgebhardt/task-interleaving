@@ -16,14 +16,14 @@ To be published soon.
 ## Citation
 If you are using the code-base and/or our dataset in research, please use the following citation:
 ```
-    @article{gebhardt2021hierarchical,
-      title={Hierarchical reinforcement learning explains task interleaving behavior},
-      author={Gebhardt, Christoph and Oulasvirta, Antti and Hilliges, Otmar},
-      journal={Computational Brain \& Behavior},
-      volume={4},
-      number={3},
-      pages={284--304},
-      year={2021},
-      publisher={Springer}
-    }
+@article{gebhardt2021hierarchical,
+  title={Hierarchical reinforcement learning explains task interleaving behavior},
+  author={Gebhardt, Christoph and Oulasvirta, Antti and Hilliges, Otmar},
+  journal={Computational Brain \& Behavior},
+  volume={4},
+  number={3},
+  pages={284--304},
+  year={2021},
+  publisher={Springer}
+}
 ```
