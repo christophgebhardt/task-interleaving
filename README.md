@@ -14,7 +14,7 @@ To be published soon.
 To be published soon.
 
 ## Citation
-If you are using the code-base and/or our dataset in research, please use the following citation:
+If you are using the code-base and/or the dataset in research, please use the following citation:
 ```
 @article{gebhardt2021hierarchical,
   title={Hierarchical reinforcement learning explains task interleaving behavior},
