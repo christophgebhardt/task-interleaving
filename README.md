@@ -11,7 +11,7 @@ The code accompanying the paper "[Hierarchical Reinforcement Learning Explains T
 To be published soon.
 
 ## Model Fitting with Approximate Bayesian Computation
-To fit the HRL model to a specific user in our dataset, you can use [ELFI](https://elfi.readthedocs.io/en/latest/index.html) and follow the approach descriped in [1]. The code of our fitting procedure will be published soon.
+To fit the HRL model to a specific user in our dataset, you can use [ELFI](https://elfi.readthedocs.io/en/latest/index.html) and follow the approach descriped in [1]. The code of our fitting procedure is still to be published.
 
 [1] Kangasrääsiö, A., Athukorala, K., Howes, A., Corander, J., Kaski, S., & Oulasvirta, A. (2017, May). Inferring cognitive models from data using approximate Bayesian computation. In Proceedings of the 2017 CHI conference on human factors in computing systems (pp. 1295-1306).
 
