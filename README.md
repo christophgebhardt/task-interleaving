@@ -7,9 +7,8 @@ The code accompanying the paper "[Hierarchical Reinforcement Learning Explains T
 ## Hierarchical Reinforcement Learning Model
 ### Setup
 
-## Model Fitting with Approximate Bayesian Computation
-To be published soon.
-
 ## Data
 To be published soon.
 
+## Model Fitting with Approximate Bayesian Computation
+To be published soon.
