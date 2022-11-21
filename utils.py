@@ -1,7 +1,8 @@
 import numpy as np
+import pickle
 
 
-def update_init_tables(learning_manager, init_tables=None):
+def get_agent_state_value_functions(learning_manager, init_tables=None):
     # copy learned tables into init tables for initializing test manager and later learning managers
     if init_tables is None:
         init_tables = [{}, {}]
@@ -44,23 +45,6 @@ def sparse_output(reward_at_step, state_sequence, task_at_step, costs_at_step):
     return np.array(sp_reward_at_step), np.array(sp_state_sequence), sp_task_at_step, np.array(sp_costs_at_step)
 
 
-def adjust_resumption_cost(task_list, const_cost, calc_scaler, check_scaler, read_scaler, type_scaler):
-    for i in range(len(task_list)):
-        # print(task_list[i].task_type)
-        # print(task_list[i].resumption)
-        if task_list[i].task_type == "calculating":
-            task_list[i].resumption *= calc_scaler
-        elif task_list[i].task_type == "checking":
-            task_list[i].resumption *= check_scaler
-        elif task_list[i].task_type == "reading":
-            task_list[i].resumption *= read_scaler
-        elif task_list[i].task_type == "typing":
-            task_list[i].resumption *= type_scaler
-        # print(task_list[i].resumption)
-        task_list[i].resumption += const_cost
-        # print(task_list[i].resumption)
-        
-
 def get_state_trajectory(trajectory):
     obs = trajectory[0]
     num_visited_states = 1
@@ -75,3 +59,19 @@ def get_state_trajectory(trajectory):
             state_trajectory.append(obs)
 
     return state_trajectory, num_visited_states
+
+
+def load_pkl_file(file_path):
+    with open(file_path, 'rb') as f:
+        pkl_obj = pickle.load(f)
+    return pkl_obj
+
+
+def add_trajectories_to_task(task_list, trajectory_list):
+    for i in range(len(task_list)):
+        task_list[i].trajectories = trajectory_list[task_list[i].task_type]
+
+
+def add_state_distribution_to_task(task_list, distribution_list):
+    for i in range(len(task_list)):
+        task_list[i].delta_state_distribution = distribution_list[task_list[i].task_type]

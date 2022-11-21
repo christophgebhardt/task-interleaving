@@ -6,9 +6,25 @@ The code accompanying the paper "[Hierarchical Reinforcement Learning Explains T
 
 ## Hierarchical Reinforcement Learning Model
 ### Setup
+Please note that we have tested this code-base under Python 3.9.
+
+Clone this repository somewhere with:
+```
+git clone https://github.com/christophgebhardt/task-interleaving.git
+cd task-interleaving
+```
+
+Then from the base directory of this repository, install all dependencies with:
+```
+pip install -r requirements.txt
+```
+
+### Usage
+Please see the Jupyter notebook [task-interleaving](task-interleaving.ipynb) for an instructions on how to use the model.
+The code of this notebook (without instructions) is also available in [run.py](run.py).
 
 ## Data
-To be published.
+The dataset of this work is available on request. Please fill in this [Google Form](https://forms.gle/K8P1UfnCnqRGQbne8) to gain access to the dataset.
 
 ## Model Fitting with Approximate Bayesian Computation
 To fit the HRL model to a specific user in our dataset, you can use [ELFI](https://elfi.readthedocs.io/en/latest/index.html) and follow the approach descriped in [1]. The code of our fitting procedure is still to be published.

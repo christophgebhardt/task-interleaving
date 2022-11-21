@@ -2,3 +2,4 @@
 task_interleaving/__pycache__/
 task_interleaving/agent/__pycache__/
 *.pyc
+.ipynb_checkpoints/

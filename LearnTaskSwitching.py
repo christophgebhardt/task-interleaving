@@ -24,9 +24,7 @@ class LearnTaskSwitching:
         (default = false)
         :param learning_rate: float (default = 0.1)
         :param epsilon: float (default = 0.2)
-        :param steps_per_episode: max number of steps per episode (default = 80)
         :param num_episodes: number of episodes in learning (default = 100000)
-        :param task_colors: colors of tasks for plotting (default = None)
         :param gamma_0: Sets the discount factor of the higher level (default = 0.1)
         :param gamma_1: Sets the discount factor of the lower level (default = 0.8)
         :param reward_threshold: Expected out of task reward for learning a lower level policy only (default = 0.5)
@@ -49,17 +47,13 @@ class LearnTaskSwitching:
         self.epsilon = 0.1  # of epsilon greedy policy
         self.gamma_0 = 0.1  # discount factor
         self.gamma_1 = 0.8  # discount factor
-        self.num_episodes = 100000
-        self.steps_per_episode = 80
-        self.colors = None
+        self.num_episodes = 250
         # debug parameters
         self.verbose_switching = 0
         self.verbose_pursuing = False
         self.reward_threshold = 0.5
-        self.task_colors = None
         self.is_reward_from_obs = False
         is_hierarchically_optimal = True
-        is_reward_in_state = False
         self.is_smdp = False
         is_flat_rl = False
         init_functions = None
@@ -79,22 +73,16 @@ class LearnTaskSwitching:
                 self.gamma_1 = value
             elif key == "num_episodes":
                 self.num_episodes = value
-            elif key == "steps_per_episode":
-                self.steps_per_episode = value
             elif key == "verbose_switching":
                 self.verbose_switching = value
             elif key == "verbose_pursuing":
                 self.verbose_pursuing = value
             elif key == "reward_threshold":
                 self.reward_threshold = value
-            elif key == "task_colors":
-                self.task_colors = value
             elif key == "reward_from_observation":
                 self.is_reward_from_obs = value
             elif key == "is_hierarchically_optimal":
                 is_hierarchically_optimal = value
-            elif key == "is_reward_in_state":
-                is_reward_in_state = value
             elif key == "is_smdp":
                 self.is_smdp = value
             elif key == "is_flat_rl":
@@ -121,8 +109,7 @@ class LearnTaskSwitching:
 
         self.experiment_instance = TaskSwitching(self.in_task_instances, function, is_hierarchically_optimal)
         self.experiment_instance.set_parameters(self.verbose_switching, self.learn_switch_costs, self.learning_rate,
-                                                self.epsilon, self.steps_per_episode, self.num_episodes,
-                                                self.task_colors)
+                                                self.epsilon, self.num_episodes)
         self.set_gamma_0(self.gamma_0)
         self.set_gamma_1(self.gamma_1)
 
@@ -237,29 +224,6 @@ class LearnTaskSwitching:
         if self.is_smdp:
             ref_trajectory, _ = get_state_trajectory(ref_trajectory)
         return self.experiment_instance.test_ref_trajectory(ref_trajectory)
-
-    def test_against_reference_trajectory_stats(self, ref_trajectory):
-        """
-        Tests the learned policy, the greedy policy and the random policy against a reference trajectory specifying the
-        sequence of actions of a participant of the study. Computes more extensive statistic than test_ref_trajectory.
-        :param ref_trajectory: sequence of actions of participant of the study
-        :return: tuple of extensive statistics of policies.
-        """
-        if self.is_smdp:
-            ref_trajectory, _ = get_state_trajectory(ref_trajectory)
-        return self.experiment_instance.test_ref_trajectory_stats(ref_trajectory)
-
-    def test_against_reference_trajectory_continue(self, ref_trajectory):
-        """
-        Tests the learned policy, the greedy policy and the random policy against a reference trajectory specifying the
-        sequence of actions of a participant of the study. Check if policies predict leave correctly and then makes the
-        right switching level decision.
-        :param ref_trajectory: sequence of actions of participant of the study
-        :return: tuple of percent of correct task leaving decisions of agent, random policy and greedy policy.
-        """
-        if self.is_smdp:
-            ref_trajectory, _ = get_state_trajectory(ref_trajectory)
-        return self.experiment_instance.test_ref_trajectory_continue(ref_trajectory)
 
     def reset(self):
         """

@@ -12,6 +12,10 @@ class TaskSwitching:
     Class manages the learning of an RL-agent on the higher level (task interleaving level) of the hierarchy.
     """
 
+    task_colors = ['b', 'g', 'm', 'c', 'r', 'y', 'maroon', 'springgreen', 'indigo', 'cornflowerblue', 'fuchsia',
+                   'lightpink', 'crimson', 'firebrick', 'lawngreen', 'cadetblue', 'aquamarine', 'lightsteelblue',
+                   'brown', 'orange', 'gold', 'purple', 'pink', 'skyblue', 'k', 'w', 'gray']
+
     def __init__(self, in_task_instances, function, is_hierarchically_optimal=True):
         """
         Constructor
@@ -22,7 +26,6 @@ class TaskSwitching:
         """
         # parameters
         self.verbose = 0
-        self.task_colors = None
 
         self.function = function
         self.environment = TaskSwitchingEnvironment(in_task_instances, self.function)
@@ -149,11 +152,6 @@ class TaskSwitching:
         self.agent.init(self.rl_task)
         num_pursuing_actions = 0
         while not self.rl_task.is_finished():
-            # print()
-            # for in_task_instance in self.environment.in_task_instances:
-            #     if not in_task_instance.is_finished():
-            #         print("not finished {} {}".format(in_task_instance.task.task_type, in_task_instance.task.task_num))
-            # print()
             state = self.rl_task.get_state()
             action_switching, action_pursuing = self.__get_greedy_agent_action(state)
             # action_switching, action_pursuing = self.get_greedy_agent_action_reward(state)
@@ -196,86 +194,8 @@ class TaskSwitching:
         return np.array(total_reward_at_step), np.array(reward_at_step), np.array(costs_at_step), \
                np.array(observation_sequence), np.array(task_at_step)
 
-    def test_ref_trajectory(self, ref_trajectory):
-        """
-        Tests the learned policy, the greedy policy and the random policy against a reference trajectory specifying the
-        sequence of actions of a participant of the study
-        :param ref_trajectory: sequence of actions of participant of the study
-        :return: tuple of percent of matching actions of agent, random policy and greedy policy.
-        """
-        self.rl_task.is_learning = False
-        self.reset()
-        num_actions = 0
-        num_correct_actions = 0
-        num_correct_actions_random = 0
-        num_correct_actions_greedy = 0
-        reward_in_task = {}
-        time_in_task = {}
-
-        obs = ref_trajectory[0]
-        self.agent.init(self.rl_task)
-        state = self.rl_task.get_state()
-        task = self.agent.choose_optimal_action(state)
-        num_actions += 1
-        # for the first decision it is sufficient to pick the same task type
-        if self.environment.in_task_instances[task].task.task_type == obs.task_type:
-            num_correct_actions += 1
-        # random baseline on task switching level
-        rand_action = self.__get_random_switching_action(state)
-        if rand_action == obs.task_id:
-            num_correct_actions_random += 1
-        # greedy baseline on task switching level
-        greedy_action_s, _ = self.__get_greedy_agent_action(-1)
-        if greedy_action_s == obs.task_id:
-            num_correct_actions_greedy += 1
-
-        for i in range(0, len(ref_trajectory) - 1):
-            obs = ref_trajectory[i]
-            next_obs = ref_trajectory[i + 1]
-            if obs.task_id == next_obs.task_id:
-                continue
-
-            num_actions += 2
-            # get state of ppt and set in_task_instance accordingly
-            state = self.__get_state_of_observation(obs, reward_in_task, time_in_task)
-            self.environment.in_task_instances[obs.task_id].agent.state = state
-
-            # check if greedy baseline correct
-            greedy_action_s, greedy_action_p = self.__get_greedy_agent_action(obs.task_id)
-            if greedy_action_p == 1:
-                num_correct_actions_greedy += 1
-            if greedy_action_s == next_obs.task_id:
-                num_correct_actions_greedy += 1
-
-            # check if random baseline correct
-            rand_action = self.__get_random_pursuing_action()
-            # if correctly predicted leave
-            if rand_action == 1:
-                num_correct_actions_random += 1
-            # random baseline on task switching level
-            rand_action = self.__get_random_switching_action(obs.task_id)
-            if rand_action == next_obs.task_id:
-                num_correct_actions_random += 1
-
-            # check decision of agent
-            q_max, _ = self.environment.get_max_q_value(obs.task_id)
-            self.environment.in_task_instances[obs.task_id].function.expected_out_of_task_reward = q_max
-            action = self.environment.in_task_instances[obs.task_id].agent.choose_optimal_action(state)
-            # action 0 is continue, action 1 is leave task
-            if action == 1:
-                num_correct_actions += 1
-            # check correct action on switching level
-            task = self.agent.choose_optimal_action(obs.task_id)
-            if task == next_obs.task_id:
-                num_correct_actions += 1
-
-        percent_correct = num_correct_actions / num_actions
-        percent_random = num_correct_actions_random / num_actions
-        percent_greedy = num_correct_actions_greedy / num_actions
-        return percent_correct, percent_random, percent_greedy
-
     # calculate stats on agents decision
-    def test_ref_trajectory_stats(self, ref_trajectory):
+    def test_ref_trajectory(self, ref_trajectory):
         """
         Tests the learned policy, the greedy policy and the random policy against a reference trajectory specifying the
         sequence of actions of a participant of the study. Computes more extensive statistic than test_ref_trajectory.
@@ -389,87 +309,6 @@ class TaskSwitching:
                           percent_random_continue])
         return stats
 
-    def test_ref_trajectory_continue(self, ref_trajectory):
-        """
-        Tests the learned policy, the greedy policy and the random policy against a reference trajectory specifying the
-        sequence of actions of a participant of the study. Check if policies predict leave correctly and then makes the
-        right switching level decision.
-        :param ref_trajectory: sequence of actions of participant of the study
-        :return: tuple of percent of correct task leaving decisions of agent, random policy and greedy policy.
-        """
-        self.rl_task.is_learning = False
-        self.reset()
-        num_actions = 0
-        num_correct_actions = 0
-        num_correct_actions_random = 0
-        num_correct_actions_continue = 0
-        num_correct_actions_greedy = 0
-        reward_in_task = {}
-        time_in_task = {}
-
-        obs = ref_trajectory[0]
-        self.agent.init(self.rl_task)
-        state = self.rl_task.get_state()
-        task = self.agent.choose_optimal_action(state)
-        num_actions += 1
-        # for the first decision it is sufficient to pick the same task type
-        if self.environment.in_task_instances[task].task.task_type == obs.task_type:
-            num_correct_actions += 1
-        # random baseline on task switching level
-        rand_action = self.__get_random_switching_action(state)
-        if rand_action == obs.task_id:
-            num_correct_actions_random += 1
-        # greedy baseline on task switching level
-        greedy_action_s, _ = self.__get_greedy_agent_action(-1)
-        if greedy_action_s == obs.task_id:
-            num_correct_actions_greedy += 1
-
-        for i in range(0, len(ref_trajectory) - 1):
-            num_actions += 1
-            obs = ref_trajectory[i]
-            next_obs = ref_trajectory[i+1]
-
-            # check decision of agent
-            q_max, _ = self.environment.get_max_q_value(obs.task_id)
-            self.environment.in_task_instances[obs.task_id].function.expected_out_of_task_reward = q_max
-            state = self.__get_state_of_observation(obs, reward_in_task, time_in_task)
-            self.environment.in_task_instances[obs.task_id].agent.state = state
-            action = self.environment.in_task_instances[obs.task_id].agent.choose_optimal_action(state)
-            # action 0 is continue, action 1 is leave task
-            if next_obs.task_id == obs.task_id and action == 0:
-                num_correct_actions += 1
-            elif next_obs.task_id != obs.task_id and action == 1:
-                task = self.agent.choose_optimal_action(obs.task_id)
-                if task == next_obs.task_id:
-                    num_correct_actions += 1
-
-            # check if greedy baseline correct
-            greedy_action_s, greedy_action_p = self.__get_greedy_agent_action(obs.task_id)
-            if next_obs.task_id == obs.task_id and greedy_action_p == 0:
-                num_correct_actions_greedy += 1
-            elif next_obs.task_id != obs.task_id and greedy_action_p == 1:
-                if next_obs.task_id != obs.task_id and greedy_action_s == next_obs.task_id:
-                    num_correct_actions_greedy += 1
-
-            # check if continue baseline correct
-            if next_obs.task_id == obs.task_id:
-                num_correct_actions_continue += 1
-            # check if random baseline correct
-            rand_action = self.__get_random_pursuing_action()
-            if next_obs.task_id == obs.task_id and rand_action == 0:
-                num_correct_actions_random += 1
-            elif next_obs.task_id != obs.task_id and rand_action == 1:
-                # random baseline on task switching level
-                rand_action = self.__get_random_switching_action(obs.task_id)
-                if rand_action == next_obs.task_id:
-                    num_correct_actions_random += 1
-
-        percent_correct = num_correct_actions / num_actions
-        percent_random = num_correct_actions_random / num_actions
-        percent_continue = num_correct_actions_continue / num_actions
-        percent_greedy = num_correct_actions_greedy / num_actions
-        return percent_correct, percent_random, percent_continue, percent_greedy
-
     def reset(self):
         """
         Resets the TaskSwitching HRL agent
@@ -478,25 +317,21 @@ class TaskSwitching:
         self.rl_task.reset()
         self.environment.reset()
 
-    def set_parameters(self, verbose, learn_costs, learning_rate, epsilon, steps_episode, num_episodes, task_colors):
+    def set_parameters(self, verbose, learn_costs, learning_rate, epsilon, num_episodes):
         """
         Setter function for additional parameters
         :param verbose: flag indicating if verbose
         :param learn_costs: flag indicating if resumption costs should be considered within the task
         :param learning_rate: float
         :param epsilon: float
-        :param steps_episode: max number of steps per episode
         :param num_episodes: number of episodes in learning
-        :param task_colors: colors of tasks for plotting
         :return:
         """
         self.verbose = verbose
         self.function.alpha = learning_rate
         self.rl_task.learn_costs = learn_costs
         self.agent.epsilon = epsilon  # of epsilon greedy policy
-        self.rl_task.steps_per_episode = steps_episode
         self.num_episodes = num_episodes
-        self.task_colors = task_colors
 
     def set_discount_factor(self, discount_factor):
         """

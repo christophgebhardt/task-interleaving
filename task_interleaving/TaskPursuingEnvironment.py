@@ -66,8 +66,8 @@ class TaskPursuingEnvironment(Environment):
                 while self.prog_ix < len(self.active_trajectory) and temp_obs - obs < progress:
                     self.prog_ix += 1
                     temp_obs = self.active_trajectory[self.prog_ix].observation_discrete[0]
-                print(obs)
-                print(temp_obs)
+                # print(obs)
+                # print(temp_obs)
 
             # check if current active trajectory still has entries if not update
             if self.prog_ix >= len(self.active_trajectory):

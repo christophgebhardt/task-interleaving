@@ -13,7 +13,6 @@ class TaskSwitchingTask(Task):
         """
         Task.__init__(self, environment)
         self.learn_costs = False
-        self.steps_per_episode = 100
         self.num_steps = 0
         self.reward = 0
         self.reward_stats = 0

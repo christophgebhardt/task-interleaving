@@ -1,12 +1,14 @@
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
+from utils import sparse_output
 try:
     import seaborn as sns
     sns.set()
 except:
     print("seaborn not available")
-font_size = 14
+
+font_size = 12
 
 
 def get_reward_cost_figure(task_len, reward_at_step, cost_at_step, reward, cost, **kwargs):
@@ -243,7 +245,7 @@ def plot_policy_evaluation(reward_at_step, action_sequence, **kwargs):
     plt.subplots_adjust(left=0.05, right=0.95)
     f = plt.gcf()
     default_size = f.get_size_inches()
-    f.set_size_inches((default_size[0] * 2.5, default_size[1] * 1))
+    f.set_size_inches((default_size[0] * 10, default_size[1] * 1))
     if save_plot:
         if plot_title == -1:
             plt.savefig('./plots/policy.png')  # save graph to folder
@@ -349,11 +351,10 @@ def plot_cost_to_go(function, max_state, **kwargs):
         #         val = val_1
         # actions[i] = action
 
-    font_size = 35
     fig = plt.figure()
     plt.rcParams.update({'font.size': font_size})
-    # if plot_title != -1:
-    #     plt.suptitle(plot_title)
+    if plot_title != -1:
+        plt.suptitle(plot_title)
     # Plot the values for action 0.
     ax = fig.add_subplot(121)
     ax.plot(scroll_values, values_0)
@@ -465,3 +466,57 @@ def get_max_reward(task_type):
         return 16
     else:  # calculating or typing
         return 6
+
+
+def plot_in_task_state_value_functions(testing_manager):
+    type_list = []
+    # evaluate in-task policies or turn off in-task prints
+    for i in range(testing_manager.experiment_instance.environment.num_tasks):
+        in_task_instance = testing_manager.experiment_instance.environment.in_task_instances[i]
+        # in_task_instance.verbose = False
+        if in_task_instance.task.task_type not in type_list:
+            title = "{}".format(in_task_instance.task.task_type)
+            plot_cost_to_go(in_task_instance.function, in_task_instance.environment.max_state, plot_title=title)
+            type_list.append(in_task_instance.task.task_type)
+
+
+def plot_high_level_state_value_functions(testing_manager):
+    # evaluate root policy (between task policy)
+    # testing_manager.experiment_instance.verbose = False
+    type_list = []
+    for i in range(testing_manager.experiment_instance.environment.num_tasks):
+        in_task_instance = testing_manager.experiment_instance.environment.in_task_instances[i]
+        if in_task_instance.task.task_type not in type_list:
+            function = testing_manager.experiment_instance.function.functions[i]
+            title = "{}-switch".format(in_task_instance.task.task_type)
+            plot_cost_to_go(function, in_task_instance.environment.max_state, plot_title=title, is_switching=True)
+            type_list.append(in_task_instance.task.task_type)
+
+
+def plot_policy(testing_manager):
+    total_reward_at_step, reward_at_step, costs_at_step, observation_sequence, task_at_step = \
+        testing_manager.test_task_switching_policy()
+
+    # adjust observation trajectory and calculate action sequence
+    state_sequence = []
+    index = 0
+    for observation in observation_sequence:
+        state_sequence.append(str(observation.task_id) + "," + str(observation.state_estimate))
+        observation.time = float(index)
+        observation.reward = reward_at_step[index]
+        observation.cost = costs_at_step[index]
+        index += 1
+
+    print("avg. reward per step: {}\n".format(total_reward_at_step[-1] / len(total_reward_at_step)))
+    for i in range(testing_manager.experiment_instance.environment.num_tasks):
+        print("task {} - {}: {}".format(i, testing_manager.task_list[i].task_type,
+                                        testing_manager.experiment_instance.task_colors[i]))
+
+    max_val = np.max(reward_at_step)
+    max_cost = np.max(costs_at_step)
+    if max_cost > max_val:
+        max_val = max_cost
+    reward_at_step, state_sequence, task_at_step, costs_at_step = sparse_output(reward_at_step, state_sequence,
+                                                                                task_at_step, costs_at_step)
+    plot_policy_evaluation(reward_at_step, state_sequence, task_at_step=task_at_step, costs_at_step=costs_at_step,
+                           max_value=max_val, plot_title='reward ' + str(total_reward_at_step[-1]))
