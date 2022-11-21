@@ -20,11 +20,11 @@ pip install -r requirements.txt
 ```
 
 ### Usage
-Please see the Jupyter notebook [task-interleaving](task-interleaving.ipynb) for an instructions on how to use the model.
+Please see the Jupyter notebook [task-interleaving.ipynb](task-interleaving.ipynb) for an instructions on how to use the model.
 The code of this notebook (without instructions) is also available in [run.py](run.py).
 
 ## Data
-The dataset of this work is available on request. Please fill in this [Google Form](https://forms.gle/K8P1UfnCnqRGQbne8) to gain access to the dataset.
+The dataset of this work is available on request. Please fill in this [Google Form](https://docs.google.com/forms/d/e/1FAIpQLSeyZ8A4Uw1L7a9ssmW-g6Yzdhi68mteQuYBmnpu8GaBrUy-cA/viewform?usp=sf_link) to gain access to the dataset.
 
 ## Model Fitting with Approximate Bayesian Computation
 To fit the HRL model to a specific user in our dataset, you can use [ELFI](https://elfi.readthedocs.io/en/latest/index.html) and follow the approach descriped in [1]. The code of our fitting procedure is still to be published.

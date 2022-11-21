@@ -5,16 +5,13 @@ from task_interleaving.TaskSwitchingEnvironment import TaskSwitchingEnvironment
 from task_interleaving.TaskSwitchingTask import TaskSwitchingTask
 from task_interleaving.agent.QAgent import QAgent
 from task_interleaving.agent.SarsaAgent import SarsaAgent
+from task_interleaving.task_colors import task_colors
 
 
 class TaskSwitching:
     """
     Class manages the learning of an RL-agent on the higher level (task interleaving level) of the hierarchy.
     """
-
-    task_colors = ['b', 'g', 'm', 'c', 'r', 'y', 'maroon', 'springgreen', 'indigo', 'cornflowerblue', 'fuchsia',
-                   'lightpink', 'crimson', 'firebrick', 'lawngreen', 'cadetblue', 'aquamarine', 'lightsteelblue',
-                   'brown', 'orange', 'gold', 'purple', 'pink', 'skyblue', 'k', 'w', 'gray']
 
     def __init__(self, in_task_instances, function, is_hierarchically_optimal=True):
         """
@@ -121,7 +118,7 @@ class TaskSwitching:
             costs_at_step = np.append(costs_at_step, np.zeros(len(self.rl_task.observation_sequence_in_task) - 1))
             observation_sequence = np.append(observation_sequence, self.rl_task.observation_sequence_in_task)
             for i in range(len(self.rl_task.observation_sequence_in_task)):
-                task_at_step.append(self.task_colors[self.agent.action])
+                task_at_step.append(task_colors[self.agent.action])
 
             if self.verbose == 2:
                 print("")
@@ -167,7 +164,7 @@ class TaskSwitching:
                 total_reward_at_step.append(total_reward)
                 reward_at_step.append(task_pursuing.rl_task.get_stats_reward())
                 observation_sequence.append(copy(task_pursuing.environment.observation))
-                task_at_step.append(self.task_colors[state])
+                task_at_step.append(task_colors[state])
                 num_pursuing_actions += 1
             else:
                 if num_pursuing_actions > 0:

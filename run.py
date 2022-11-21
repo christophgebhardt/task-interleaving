@@ -1,5 +1,5 @@
 from LearnTaskSwitching import LearnTaskSwitching
-from plot_utilities import plot_reward_learning, plot_policy, plot_in_task_state_value_functions, plot_high_level_state_value_functions
+from plot_utilities import plot_reward_learning, plot_policy, plot_in_task_state_value_functions, plot_high_level_state_value_functions, plot_task_environment
 from utils import get_agent_state_value_functions, load_pkl_file, add_trajectories_to_task, add_state_distribution_to_task
 
 
@@ -30,6 +30,9 @@ def main():
 
     add_state_distribution_to_task(task_list, distribution_list)
     add_trajectories_to_task(task_list, trajectory_list)
+
+    # Visualize environment
+    plot_task_environment(task_list)
 
     learning_manager = LearnTaskSwitching(task_list, num_episodes=num_episodes, verbose_switching=verbose_switching,
                                           learn_pursue_costs=learn_pursue_costs, learn_switch_costs=learn_switch_costs,

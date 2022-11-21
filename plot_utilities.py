@@ -2,6 +2,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
 from utils import sparse_output
+from task_interleaving.task_colors import task_colors
 try:
     import seaborn as sns
     sns.set()
@@ -245,7 +246,7 @@ def plot_policy_evaluation(reward_at_step, action_sequence, **kwargs):
     plt.subplots_adjust(left=0.05, right=0.95)
     f = plt.gcf()
     default_size = f.get_size_inches()
-    f.set_size_inches((default_size[0] * 10, default_size[1] * 1))
+    f.set_size_inches((default_size[0] * 2.5, default_size[1] * 1))
     if save_plot:
         if plot_title == -1:
             plt.savefig('./plots/policy.png')  # save graph to folder
@@ -358,7 +359,7 @@ def plot_cost_to_go(function, max_state, **kwargs):
     # Plot the values for action 0.
     ax = fig.add_subplot(121)
     ax.plot(scroll_values, values_0)
-    # ax.set_title("Action 0")
+    ax.set_title("action: continue")
     # if step_size == 1:
     #     ax.set_xticks(scroll_values)
     for tick in ax.xaxis.get_major_ticks():
@@ -371,7 +372,7 @@ def plot_cost_to_go(function, max_state, **kwargs):
     if not is_switching:
         ax = fig.add_subplot(122)
         ax.plot(scroll_values, values_1)
-        # ax.set_title("Action 1")
+        ax.set_title("action: leave")
         # if step_size == 1:
         #     ax.set_xticks(scroll_values)
         for tick in ax.xaxis.get_major_ticks():
@@ -509,8 +510,7 @@ def plot_policy(testing_manager):
 
     print("avg. reward per step: {}\n".format(total_reward_at_step[-1] / len(total_reward_at_step)))
     for i in range(testing_manager.experiment_instance.environment.num_tasks):
-        print("task {} - {}: {}".format(i, testing_manager.task_list[i].task_type,
-                                        testing_manager.experiment_instance.task_colors[i]))
+        print("task {}, type: {}, color: {}".format(i, testing_manager.task_list[i].task_type, task_colors[i]))
 
     max_val = np.max(reward_at_step)
     max_cost = np.max(costs_at_step)
@@ -520,3 +520,29 @@ def plot_policy(testing_manager):
                                                                                 task_at_step, costs_at_step)
     plot_policy_evaluation(reward_at_step, state_sequence, task_at_step=task_at_step, costs_at_step=costs_at_step,
                            max_value=max_val, plot_title='reward ' + str(total_reward_at_step[-1]))
+
+
+def plot_task_environment(task_list):
+    num_tasks = len(task_list)
+    # identify max reward and cost value for plotting
+    max_value = 0
+    for i in range(num_tasks):
+        max_reward = np.max(task_list[i].reward)
+        if max_reward > max_value:
+            max_value = max_reward
+        max_costs = np.max(task_list[i].resumption)
+        if max_costs > max_value:
+            max_value = max_costs
+            
+    # plot each task
+    for i in range(num_tasks):
+        plot_title = 'task ' + str(task_list[i].task_num)
+        if task_list[i].is_continuing:
+            plot_title += ', continuing'
+        else:
+            plot_title += ', not continuing'
+        if task_list[i].task_type is not None:
+            plot_title += ', ' + task_list[i].task_type
+        get_reward_cost_figure(task_list[i].task_len, task_list[i].reward, task_list[i].resumption,
+                               task_list[i].reward_spline, task_list[i].cost_spline, task_num=i,
+                               task_color=task_colors[i], plot_title=plot_title, max_value=max_value)
